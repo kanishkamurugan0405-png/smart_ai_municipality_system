@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Smart Municipality Portal</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); min-height: 100vh; display: flex; flex-direction: column;">
+
+  <div class="gov-strip">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span>🏛️ Municipal Corporation Portal</span>
+      <span class="badge-ai">SECURE ACCESS</span>
+    </div>
+    <a href="index.html">← Back to Home</a>
+  </div>
+
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+    <div class="card" style="max-width: 460px; width: 100%; box-shadow: var(--shadow-lg); padding: 2.25rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div class="brand-logo" style="margin: 0 auto 0.75rem; width: 52px; height: 52px; font-size: 1.6rem;">🏙️</div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">Smart Municipality Login</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+          Sign in to report or triage municipal civic complaints
+        </p>
+      </div>
+
+      <!-- Quick Demo Credentials Box -->
+      <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.5rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+          ⚡ Quick Demo Credentials:
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-secondary btn-sm" style="flex: 1;" onclick="fillCredentials('citizen@municipality.gov', 'citizen123')">
+            👤 Citizen
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" style="flex: 1;" onclick="fillCredentials('officer@municipality.gov', 'officer123')">
+            🛡️ Officer
+          </button>
+        </div>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" class="form-control" placeholder="e.g. citizen@municipality.gov" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+          Sign In
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted);">
+        Don't have an account? <a href="register.html" style="color: var(--primary-accent); font-weight: 600; text-decoration: none;">Register as Citizen</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    function fillCredentials(email, pass) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = pass;
+    }
+
+    // Check query params if officer requested
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('role') === 'officer') {
+      fillCredentials('officer@municipality.gov', 'officer123');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      btn.disabled = true;
+      btn.textContent = 'Authenticating...';
+
+      try {
+        const user = await api.login(email, password);
+        auth.setUser(user);
+        showToast(`Welcome back, ${user.name}!`, 'success');
+
+        setTimeout(() => {
+          if (user.role === 'MUNICIPAL_OFFICER') {
+            window.location.href = 'officer-dashboard.html';
+          } else {
+            window.location.href = 'citizen-dashboard.html';
+          }
+        }, 600);
+      } catch (err) {
+        showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    });
+  </script>
+</body>
+</html>

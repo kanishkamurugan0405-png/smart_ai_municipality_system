@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complaint Details & Status Tracking - Smart Municipality</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Strip -->
+  <div class="gov-strip">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span>🏛️ Municipal Grievance Tracking System</span>
+      <span class="badge-ai">LIVE AUDIT TIMELINE</span>
+    </div>
+    <a href="javascript:history.back()">← Back</a>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="index.html" class="brand-wrapper">
+      <div class="brand-logo">🏙️</div>
+      <div class="brand-text">
+        <h1>SMART MUNICIPALITY</h1>
+        <p>Grievance Tracking Portal</p>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="citizen-dashboard.html">📊 Dashboard</a></li>
+      <li><a href="report.html">➕ Report Issue</a></li>
+      <li><a href="my-complaints.html">📋 My Complaints</a></li>
+      <li><a href="javascript:void(0)" onclick="auth.logout()">🚪 Logout</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="user-badge" id="nav-user-badge">
+        <div class="user-avatar" id="nav-user-avatar">U</div>
+        <span id="nav-user-name">User</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    <div id="loading" style="text-align: center; padding: 4rem; color: var(--text-muted);">
+      Loading complaint details...
+    </div>
+
+    <div id="content" style="display: none;">
+      <!-- Title & Header Bar -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+              <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary);" id="detail-id">Complaint #1000</h2>
+              <span class="badge" id="badge-status">SUBMITTED</span>
+              <span class="badge" id="badge-priority">HIGH PRIORITY</span>
+              <span id="hotspot-badge-container"></span>
+            </div>
+            <div style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.4rem;">
+              Lodged on <strong id="detail-date">-</strong> | Citizen: <strong id="detail-citizen">-</strong>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Assigned Department</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: var(--primary-accent);" id="detail-dept">Electrical Department</div>
+          </div>
+        </div>
+
+        <!-- TIMELINE STEPPER -->
+        <div class="timeline-stepper" id="stepper">
+          <div class="timeline-step" id="step-submitted">
+            <div class="step-node">✓</div>
+            <div class="step-title">Submitted</div>
+            <div class="step-time" id="time-submitted">-</div>
+          </div>
+          <div class="timeline-step" id="step-assigned">
+            <div class="step-node">2</div>
+            <div class="step-title">Assigned</div>
+            <div class="step-time" id="time-assigned">-</div>
+          </div>
+          <div class="timeline-step" id="step-in_progress">
+            <div class="step-node">3</div>
+            <div class="step-title">In Progress</div>
+            <div class="step-time" id="time-in_progress">-</div>
+          </div>
+          <div class="timeline-step" id="step-resolved">
+            <div class="step-node">4</div>
+            <div class="step-title">Resolved</div>
+            <div class="step-time" id="time-resolved">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESOLUTION BANNER (When Resolved) -->
+      <div id="resolution-banner" style="display: none; background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid #6ee7b7; border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+          <div style="font-size: 2rem;">🎉</div>
+          <div>
+            <div style="font-size: 0.82rem; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.5px;">Official Resolution Recorded</div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #065f46; margin: 0.25rem 0 0.5rem 0;" id="res-note">
+              "Streetlight repaired."
+            </h3>
+            <div style="font-size: 0.85rem; color: #047857;">
+              Resolved By: <strong id="res-by">Electrical Department</strong> | Date: <strong id="res-date">-</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 COLUMN GRID -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+        
+        <!-- LEFT: Complaint Info & AI Box -->
+        <div>
+          <!-- Photo Evidence Card -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-title" style="margin-bottom: 0.85rem;">📸 Uploaded Evidence</div>
+            <div style="background: #0f172a; border-radius: var(--radius-md); overflow: hidden; text-align: center; border: 1px solid var(--border-color);">
+              <img id="detail-image" src="" alt="Evidence" style="max-height: 280px; width: 100%; object-fit: contain;">
+            </div>
+          </div>
+
+          <!-- Description & Details -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-title" style="margin-bottom: 0.85rem;">📝 Issue Information</div>
+            <div style="margin-bottom: 1rem;">
+              <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Citizen Description</div>
+              <p style="font-size: 0.95rem; margin-top: 0.25rem; color: var(--text-main);" id="detail-desc">-</p>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+              <div>
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Location</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary);" id="detail-loc">-</div>
+              </div>
+              <div>
+                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Category</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary-accent);" id="detail-cat">-</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Analysis Box -->
+          <div class="ai-analysis-card">
+            <div class="ai-header">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.25rem;">🤖</span>
+                <span style="font-weight: 800; font-size: 1.05rem;">AI ANALYSIS</span>
+              </div>
+              <div class="ai-pill" id="detail-ai-source">RULE ENGINE FALLBACK</div>
+            </div>
+
+            <div class="ai-grid">
+              <div class="ai-metric">
+                <div class="ai-metric-label">Category</div>
+                <div class="ai-metric-val" id="detail-ai-cat">Streetlight</div>
+              </div>
+              <div class="ai-metric">
+                <div class="ai-metric-label">Severity</div>
+                <div class="ai-metric-val" id="detail-ai-sev">HIGH</div>
+              </div>
+              <div class="ai-metric">
+                <div class="ai-metric-label">Confidence</div>
+                <div class="ai-metric-val" id="detail-ai-conf">94%</div>
+                <div class="ai-bar">
+                  <div class="ai-bar-fill" id="detail-ai-bar" style="width: 94%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-reasoning">
+              <strong>Assessment: </strong>
+              <span id="detail-ai-reason">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Timeline History & Related Duplicates -->
+        <div>
+          <!-- Audit Timeline -->
+          <div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-title" style="margin-bottom: 1rem;">⏱️ Activity & Status History</div>
+            <div id="timeline-list" style="display: flex; flex-direction: column; gap: 1rem;">
+              <!-- Timeline items populated via JS -->
+            </div>
+          </div>
+
+          <!-- Possible Related Complaints -->
+          <div class="card" id="related-card" style="display: none;">
+            <div class="card-title" style="margin-bottom: 0.5rem; color: #92400e;">
+              ⚠️ Related Complaints Detected (<span id="related-count">0</span>)
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+              Similar open reports nearby. Municipal officer can inspect related cluster.
+            </p>
+            <div id="related-list" style="display: flex; flex-direction: column; gap: 0.6rem;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Smart Municipality – AI-Powered Civic Issue Management and Prioritization System &copy; 2026</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      if (!id) {
+        showToast('Complaint ID not specified', 'error');
+        return;
+      }
+
+      try {
+        const c = await api.getComplaintById(id);
+        renderComplaint(c);
+      } catch (err) {
+        showToast(err.message, 'error');
+        document.getElementById('loading').textContent = 'Complaint not found.';
+      }
+    });
+
+    function renderComplaint(c) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+
+      document.getElementById('detail-id').textContent = `Complaint #${c.id}`;
+      document.getElementById('detail-citizen').textContent = c.citizenName || 'Citizen';
+      document.getElementById('detail-date').textContent = c.createdAt ? new Date(c.createdAt).toLocaleString() : 'N/A';
+      document.getElementById('detail-dept').textContent = c.departmentName || 'Pending Assignment';
+      document.getElementById('detail-desc').textContent = c.description;
+      document.getElementById('detail-loc').textContent = c.location;
+      document.getElementById('detail-cat').textContent = c.category;
+
+      // Status badge
+      const badgeStatus = document.getElementById('badge-status');
+      badgeStatus.className = 'badge badge-' + (c.status ? c.status.toLowerCase() : 'submitted');
+      badgeStatus.textContent = c.status ? c.status.replace('_', ' ') : 'SUBMITTED';
+
+      // Priority badge
+      const badgePriority = document.getElementById('badge-priority');
+      badgePriority.className = 'badge badge-' + (c.priority ? c.priority.toLowerCase() : 'medium');
+      badgePriority.textContent = `${c.priority || 'MEDIUM'} PRIORITY`;
+
+      // Hotspot badge
+      if (c.isHotspot) {
+        document.getElementById('hotspot-badge-container').innerHTML = `
+          <span class="badge badge-hotspot">🔥 CIVIC HOTSPOT</span>
+        `;
+      }
+
+      // Evidence Image
+      const imgElem = document.getElementById('detail-image');
+      if (c.imagePath) {
+        imgElem.src = c.imagePath;
+      } else {
+        imgElem.src = '/uploads/broken_streetlight.jpg';
+      }
+
+      // Stepper states
+      const steps = ['submitted', 'assigned', 'in_progress', 'resolved'];
+      const currentIdx = steps.indexOf(c.status ? c.status.toLowerCase() : 'submitted');
+
+      steps.forEach((step, idx) => {
+        const stepElem = document.getElementById('step-' + step);
+        if (idx < currentIdx) {
+          stepElem.className = 'timeline-step completed';
+          stepElem.querySelector('.step-node').textContent = '✓';
+        } else if (idx === currentIdx) {
+          stepElem.className = 'timeline-step active';
+          stepElem.querySelector('.step-node').textContent = idx + 1;
+        } else {
+          stepElem.className = 'timeline-step';
+          stepElem.querySelector('.step-node').textContent = idx + 1;
+        }
+      });
+
+      // Timestamps in stepper from timeline
+      if (c.timeline && c.timeline.length > 0) {
+        c.timeline.forEach(t => {
+          const key = 'time-' + t.status.toLowerCase();
+          const elem = document.getElementById(key);
+          if (elem) {
+            elem.textContent = new Date(t.createdAt).toLocaleDateString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+          }
+        });
+      }
+
+      // Resolution Banner
+      if (c.status === 'RESOLVED' && c.resolutionNote) {
+        document.getElementById('resolution-banner').style.display = 'block';
+        document.getElementById('res-note').textContent = `"${c.resolutionNote}"`;
+        document.getElementById('res-by').textContent = c.resolvedBy || (c.departmentName || 'Municipal Authority');
+        document.getElementById('res-date').textContent = c.resolvedAt ? new Date(c.resolvedAt).toLocaleString() : 'Recently';
+      }
+
+      // AI Analysis
+      const ai = c.aiAnalysis || {};
+      document.getElementById('detail-ai-cat').textContent = ai.category || c.category;
+      document.getElementById('detail-ai-sev').textContent = ai.severity || c.severity;
+      const conf = ai.confidence || 92;
+      document.getElementById('detail-ai-conf').textContent = conf + '%';
+      document.getElementById('detail-ai-bar').style.width = conf + '%';
+      document.getElementById('detail-ai-reason').textContent = ai.reasoning || 'Automated multi-attribute algorithmic assessment.';
+
+      const sourceElem = document.getElementById('detail-ai-source');
+      if (ai.analysisSource === 'GEMINI_AI') {
+        sourceElem.textContent = '⚡ GEMINI 1.5 MULTIMODAL AI';
+        sourceElem.style.borderColor = '#10b981';
+        sourceElem.style.color = '#34d399';
+      } else {
+        sourceElem.textContent = '⚙️ CIVIC RULE ENGINE FALLBACK';
+      }
+
+      // Timeline List
+      const tlContainer = document.getElementById('timeline-list');
+      tlContainer.innerHTML = '';
+      if (c.timeline && c.timeline.length > 0) {
+        c.timeline.forEach(item => {
+          const div = document.createElement('div');
+          div.style.borderLeft = '3px solid #0284c7';
+          div.style.paddingLeft = '0.85rem';
+          div.style.position = 'relative';
+
+          const timeStr = new Date(item.createdAt).toLocaleString();
+          div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <strong style="color: var(--primary); font-size: 0.9rem;">${item.status.replace('_', ' ')}</strong>
+              <span style="font-size: 0.72rem; color: var(--text-muted);">${timeStr}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-main); margin-top: 0.2rem;">${item.comment || ''}</div>
+            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.15rem;">By: ${item.updatedBy || 'Officer'}</div>
+          `;
+          tlContainer.appendChild(div);
+        });
+      } else {
+        tlContainer.innerHTML = `<div style="color:var(--text-muted); font-size:0.85rem;">No activity log recorded yet.</div>`;
+      }
+
+      // Related complaints
+      if (c.relatedComplaints && c.relatedComplaints.length > 0) {
+        document.getElementById('related-card').style.display = 'block';
+        document.getElementById('related-count').textContent = c.relatedComplaints.length;
+        const relList = document.getElementById('related-list');
+        relList.innerHTML = '';
+        c.relatedComplaints.forEach(r => {
+          const div = document.createElement('div');
+          div.style.background = '#fefce8';
+          div.style.border = '1px solid #fef08a';
+          div.style.borderRadius = '6px';
+          div.style.padding = '0.65rem 0.85rem';
+          div.innerHTML = `
+            <div style="display: flex; justify-content: space-between;">
+              <a href="complaint-details.html?id=${r.relatedComplaintId}" style="font-weight: 700; color: #854d0e; text-decoration: none;">
+                Complaint #${r.relatedComplaintId} – ${r.location}
+              </a>
+              <span class="badge badge-assigned" style="font-size: 0.7rem;">${Math.round(r.similarityScore * 100)}% Match</span>
+            </div>
+            <div style="font-size: 0.78rem; color: #713f12; margin-top: 0.25rem;">${r.description || ''}</div>
+          `;
+          relList.appendChild(div);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

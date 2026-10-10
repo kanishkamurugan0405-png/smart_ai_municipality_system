@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Registration - Smart Municipality</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); min-height: 100vh; display: flex; flex-direction: column;">
+
+  <div class="gov-strip">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span>🏛️ Municipal Corporation Portal</span>
+      <span class="badge-ai">CITIZEN ENROLLMENT</span>
+    </div>
+    <a href="login.html">← Back to Login</a>
+  </div>
+
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;">
+    <div class="card" style="max-width: 480px; width: 100%; box-shadow: var(--shadow-lg); padding: 2.25rem;">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <div class="brand-logo" style="margin: 0 auto 0.75rem; width: 52px; height: 52px; font-size: 1.6rem;">📝</div>
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">Citizen Registration</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+          Register to report civic problems and track repairs in real-time
+        </p>
+      </div>
+
+      <form id="regForm">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name *</label>
+          <input type="text" id="name" class="form-control" placeholder="e.g. Ramesh Patel" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address *</label>
+          <input type="email" id="email" class="form-control" placeholder="e.g. ramesh@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">Mobile Phone (Optional)</label>
+          <input type="tel" id="phone" class="form-control" placeholder="+91 98765 00000">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password * (Min 6 characters)</label>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" minlength="6" required>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+          Create Citizen Account
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-muted);">
+        Already registered? <a href="login.html" style="color: var(--primary-accent); font-weight: 600; text-decoration: none;">Sign in here</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById('regForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value;
+
+      btn.disabled = true;
+      btn.textContent = 'Registering Account...';
+
+      try {
+        const user = await api.register(name, email, password, phone, 'CITIZEN');
+        auth.setUser(user);
+        showToast('Registration successful! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = 'citizen-dashboard.html';
+        }, 800);
+      } catch (err) {
+        showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Create Citizen Account';
+      }
+    });
+  </script>
+</body>
+</html>

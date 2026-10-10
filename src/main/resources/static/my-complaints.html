@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Complaints - Smart Municipality</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Strip -->
+  <div class="gov-strip">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span>🏛️ Citizen Services Portal</span>
+      <span class="badge-ai">LIVE TRACKING</span>
+    </div>
+    <a href="citizen-dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="citizen-dashboard.html" class="brand-wrapper">
+      <div class="brand-logo">🏙️</div>
+      <div class="brand-text">
+        <h1>SMART MUNICIPALITY</h1>
+        <p>My Civic Submissions</p>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="citizen-dashboard.html">📊 Dashboard</a></li>
+      <li><a href="report.html">➕ Report Issue</a></li>
+      <li><a href="my-complaints.html" class="active">📋 My Complaints</a></li>
+      <li><a href="javascript:void(0)" onclick="auth.logout()">🚪 Logout</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="user-badge" id="nav-user-badge">
+        <div class="user-avatar" id="nav-user-avatar">C</div>
+        <span id="nav-user-name">Citizen</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span>📋 All Complaints Lodged by You</span>
+        </div>
+        <a href="report.html" class="btn btn-primary btn-sm">➕ Report New Issue</a>
+      </div>
+
+      <div id="loading-state" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+        Loading your complaints...
+      </div>
+
+      <div id="empty-state" style="display: none; text-align: center; padding: 3rem 1rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📭</div>
+        <h3 style="font-size: 1.15rem; color: var(--primary);">No Complaints Recorded</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          You haven't lodged any civic issues yet.
+        </p>
+        <a href="report.html" class="btn btn-primary">Report an Issue Now</a>
+      </div>
+
+      <div class="table-responsive" id="table-container" style="display: none;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Category</th>
+              <th>Location</th>
+              <th>AI Severity</th>
+              <th>Priority</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="complaints-tbody">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Smart Municipality – AI-Powered Civic Issue Management and Prioritization System &copy; 2026</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = auth.requireRole('CITIZEN');
+      if (!user) return;
+
+      try {
+        const complaints = await api.getUserComplaints(user.id);
+        document.getElementById('loading-state').style.display = 'none';
+
+        if (!complaints || complaints.length === 0) {
+          document.getElementById('empty-state').style.display = 'block';
+          return;
+        }
+
+        document.getElementById('table-container').style.display = 'block';
+        const tbody = document.getElementById('complaints-tbody');
+        tbody.innerHTML = '';
+
+        complaints.forEach(c => {
+          const tr = document.createElement('tr');
+          const sevClass = 'badge-' + (c.severity ? c.severity.toLowerCase() : 'medium');
+          const statClass = 'badge-' + (c.status ? c.status.toLowerCase() : 'submitted');
+          const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A';
+
+          tr.innerHTML = `
+            <td><strong>#${c.id}</strong></td>
+            <td>
+              <div style="font-weight: 700; color: var(--primary);">${c.category}</div>
+              ${c.isHotspot ? '<span class="badge badge-hotspot" style="font-size:0.65rem; padding:1px 5px;">🔥 HOTSPOT</span>' : ''}
+            </td>
+            <td>${c.location}</td>
+            <td><span class="badge ${sevClass}">${c.severity}</span></td>
+            <td><span class="badge badge-priority" style="background:#f1f5f9; color:#1e293b; font-weight:700;">${c.priority || 'MEDIUM'}</span></td>
+            <td>${c.departmentName || '<span style="color:#94a3b8">Pending Triage</span>'}</td>
+            <td><span class="badge ${statClass}">${c.status.replace('_', ' ')}</span></td>
+            <td>${dateStr}</td>
+            <td>
+              <a href="complaint-details.html?id=${c.id}" class="btn btn-secondary btn-sm">
+                View Timeline →
+              </a>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        showToast(err.message, 'error');
+        document.getElementById('loading-state').textContent = 'Failed to load records.';
+      }
+    });
+  </script>
+</body>
+</html>

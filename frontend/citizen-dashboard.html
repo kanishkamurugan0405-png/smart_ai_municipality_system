@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Citizen Dashboard - Smart Municipality</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Strip -->
+  <div class="gov-strip">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span>🏛️ Citizen Services Portal</span>
+      <span class="badge-ai">LIVE CIVIC AI</span>
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <span id="welcome-user-text">Signed in as Citizen</span>
+      <button class="btn btn-sm btn-secondary" onclick="auth.logout()" style="padding: 2px 8px; font-size: 0.75rem;">Logout</button>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="citizen-dashboard.html" class="brand-wrapper">
+      <div class="brand-logo">🏙️</div>
+      <div class="brand-text">
+        <h1>SMART MUNICIPALITY</h1>
+        <p>Citizen Civic Dashboard</p>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="citizen-dashboard.html" class="active">📊 Dashboard</a></li>
+      <li><a href="report.html">➕ Report Issue</a></li>
+      <li><a href="my-complaints.html">📋 My Complaints</a></li>
+      <li><a href="javascript:void(0)" onclick="auth.logout()">🚪 Logout</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="user-badge" id="nav-user-badge">
+        <div class="user-avatar" id="nav-user-avatar">C</div>
+        <span id="nav-user-name">Citizen</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container">
+    
+    <!-- Welcome Header & Action Banner -->
+    <div style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border-radius: var(--radius-lg); padding: 2rem 2.25rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; box-shadow: var(--shadow-md);">
+      <div>
+        <h2 id="hero-welcome-name" style="font-size: 1.65rem; font-weight: 800; line-height: 1.2;">
+          Welcome back!
+        </h2>
+        <p style="font-size: 0.95rem; opacity: 0.9; margin-top: 0.4rem;">
+          Report municipal issues in your neighborhood. AI will instantly classify and dispatch your complaint.
+        </p>
+      </div>
+      <div>
+        <a href="report.html" class="btn btn-secondary" style="background: white; color: #0369a1; font-weight: 700; font-size: 0.95rem; box-shadow: var(--shadow-sm);">
+          ➕ Report New Civic Issue
+        </a>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-title">My Total Complaints</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-desc">Filed across all categories</div>
+      </div>
+      <div class="stat-card pending">
+        <div class="stat-title">Pending Review</div>
+        <div class="stat-value" id="stat-pending">0</div>
+        <div class="stat-desc">Awaiting department dispatch</div>
+      </div>
+      <div class="stat-card in-progress">
+        <div class="stat-title">In Progress</div>
+        <div class="stat-value" id="stat-progress">0</div>
+        <div class="stat-desc">Field engineers dispatched</div>
+      </div>
+      <div class="stat-card resolved">
+        <div class="stat-title">Resolved Issues</div>
+        <div class="stat-value" id="stat-resolved">0</div>
+        <div class="stat-desc">Completed and verified</div>
+      </div>
+    </div>
+
+    <!-- Recent Complaints Table / Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span>🕒 Recent Complaints Submitted by You</span>
+        </div>
+        <a href="my-complaints.html" class="btn btn-secondary btn-sm">View All Complaints →</a>
+      </div>
+
+      <div id="loading-state" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+        Loading complaints data...
+      </div>
+
+      <div id="empty-state" style="display: none; text-align: center; padding: 3rem 1rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📋</div>
+        <h3 style="font-size: 1.15rem; color: var(--primary);">No Complaints Filed Yet</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Notice a streetlight out, pothole, or water leak? Submit your first issue.
+        </p>
+        <a href="report.html" class="btn btn-primary">Report an Issue Now</a>
+      </div>
+
+      <div class="table-responsive" id="table-container" style="display: none;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Category</th>
+              <th>Location</th>
+              <th>AI Severity</th>
+              <th>Assigned Department</th>
+              <th>Status</th>
+              <th>Submitted Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recent-complaints-tbody">
+            <!-- Dynamically Populated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Smart Municipality – AI-Powered Civic Issue Management and Prioritization System &copy; 2026</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = auth.requireRole('CITIZEN');
+      if (!user) return;
+
+      document.getElementById('hero-welcome-name').textContent = `Welcome back, ${user.name}!`;
+      document.getElementById('welcome-user-text').textContent = `Citizen: ${user.name}`;
+
+      try {
+        const complaints = await api.getUserComplaints(user.id);
+        renderDashboard(complaints);
+      } catch (err) {
+        showToast('Error loading dashboard: ' + err.message, 'error');
+        document.getElementById('loading-state').textContent = 'Failed to load records.';
+      }
+    });
+
+    function renderDashboard(complaints) {
+      document.getElementById('loading-state').style.display = 'none';
+
+      // Counts
+      const total = complaints.length;
+      const pending = complaints.filter(c => c.status === 'SUBMITTED' || c.status === 'ASSIGNED').length;
+      const progress = complaints.filter(c => c.status === 'IN_PROGRESS').length;
+      const resolved = complaints.filter(c => c.status === 'RESOLVED').length;
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-pending').textContent = pending;
+      document.getElementById('stat-progress').textContent = progress;
+      document.getElementById('stat-resolved').textContent = resolved;
+
+      if (total === 0) {
+        document.getElementById('empty-state').style.display = 'block';
+        return;
+      }
+
+      document.getElementById('table-container').style.display = 'block';
+      const tbody = document.getElementById('recent-complaints-tbody');
+      tbody.innerHTML = '';
+
+      const recents = complaints.slice(0, 6);
+      recents.forEach(c => {
+        const tr = document.createElement('tr');
+
+        const sevClass = 'badge-' + (c.severity ? c.severity.toLowerCase() : 'medium');
+        const statClass = 'badge-' + (c.status ? c.status.toLowerCase() : 'submitted');
+
+        const dateStr = c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'Recent';
+
+        tr.innerHTML = `
+          <td><strong>#${c.id}</strong></td>
+          <td>
+            <div style="font-weight: 700; color: var(--primary);">${c.category || 'General'}</div>
+            ${c.isHotspot ? '<span class="badge badge-hotspot" style="font-size:0.65rem; padding:1px 5px;">🔥 HOTSPOT</span>' : ''}
+          </td>
+          <td>${c.location}</td>
+          <td><span class="badge ${sevClass}">${c.severity || 'MEDIUM'}</span></td>
+          <td>${c.departmentName || '<span style="color:#94a3b8">Pending Triage</span>'}</td>
+          <td><span class="badge ${statClass}">${c.status.replace('_', ' ')}</span></td>
+          <td>${dateStr}</td>
+          <td>
+            <a href="complaint-details.html?id=${c.id}" class="btn btn-secondary btn-sm">
+              Track Status →
+            </a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>

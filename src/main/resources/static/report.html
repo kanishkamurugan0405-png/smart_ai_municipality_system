@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Civic Issue - Smart Municipality</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Strip -->
+  <div class="gov-strip">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span>🏛️ Citizen Services Portal</span>
+      <span class="badge-ai">AI ISSUE SUBMISSION</span>
+    </div>
+    <a href="citizen-dashboard.html">← Back to Dashboard</a>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="citizen-dashboard.html" class="brand-wrapper">
+      <div class="brand-logo">🏙️</div>
+      <div class="brand-text">
+        <h1>SMART MUNICIPALITY</h1>
+        <p>Lodge Civic Grievance</p>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="citizen-dashboard.html">📊 Dashboard</a></li>
+      <li><a href="report.html" class="active">➕ Report Issue</a></li>
+      <li><a href="my-complaints.html">📋 My Complaints</a></li>
+      <li><a href="javascript:void(0)" onclick="auth.logout()">🚪 Logout</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="user-badge" id="nav-user-badge">
+        <div class="user-avatar" id="nav-user-avatar">C</div>
+        <span id="nav-user-name">Citizen</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container" style="max-width: 900px;">
+
+    <!-- Submission Form Section -->
+    <div id="form-section">
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📝 Lodge New Civic Issue</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-quick-fill">
+            ⚡ Quick Fill Demo Scenario (Broken Streetlight)
+          </button>
+        </div>
+
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          Upload a clear photograph and describe the issue. Our multimodal AI engine will automatically determine category, severity, and the responsible municipal department.
+        </p>
+
+        <form id="complaintForm">
+          <!-- Image Upload -->
+          <div class="form-group">
+            <label class="form-label" for="imageInput">Upload Issue Evidence (Photo / Image) *</label>
+            <div style="border: 2px dashed #cbd5e1; border-radius: var(--radius-md); padding: 1.5rem; text-align: center; background: #f8fafc; cursor: pointer;" id="drop-zone" onclick="document.getElementById('imageInput').click()">
+              <input type="file" id="imageInput" accept="image/*" style="display: none;">
+              <div id="upload-prompt">
+                <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📷</div>
+                <div style="font-weight: 600; font-size: 0.95rem; color: var(--primary);">Click to select or drag photo here</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem;">Supports JPG, PNG (Max 15MB)</div>
+              </div>
+              <div id="image-preview-container" style="display: none; margin-top: 0.75rem;">
+                <img id="image-preview" src="" alt="Preview" style="max-height: 220px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+                <div style="margin-top: 0.5rem; font-size: 0.82rem; color: var(--text-muted);" id="preview-filename"></div>
+              </div>
+            </div>
+            
+            <!-- Quick Sample Image Picker -->
+            <div style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted);">Quick Sample Photos:</span>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="selectSampleImage('broken_streetlight.jpg')">💡 Streetlight</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="selectSampleImage('pothole_crater.jpg')">🕳️ Pothole</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="selectSampleImage('water_leakage.jpg')">💧 Water Leak</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="selectSampleImage('garbage_dump.jpg')">🗑️ Garbage</button>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group">
+            <label class="form-label" for="description">Issue Description *</label>
+            <textarea id="description" class="form-control" rows="3" placeholder="Describe the civic problem clearly (e.g., Streetlight is not working at night near the cross junction)." required></textarea>
+          </div>
+
+          <!-- Location -->
+          <div class="form-group">
+            <label class="form-label" for="location">Location / Street Address *</label>
+            <input type="text" id="location" class="form-control" placeholder="e.g. XYZ Road" required>
+            
+            <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+              <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted);">Common Hotspot Roads:</span>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setLocation('XYZ Road', 12.9716, 77.5946)">📍 XYZ Road (Hotspot)</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setLocation('ABC Road', 12.9780, 77.6010)">📍 ABC Road</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setLocation('Market Road', 12.9650, 77.5890)">📍 Market Road</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setLocation('Main Street', 12.9820, 77.6150)">📍 Main Street</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="setLocation('Park Road', 12.9610, 77.6040)">📍 Park Road</button>
+            </div>
+          </div>
+
+          <!-- Optional Contact / GPS -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="contactInfo">Citizen Contact (Optional)</label>
+              <input type="text" id="contactInfo" class="form-control" placeholder="Mobile number or alternate contact">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">GPS Coordinates</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="number" step="0.0001" id="latitude" class="form-control" placeholder="Latitude">
+                <input type="number" step="0.0001" id="longitude" class="form-control" placeholder="Longitude">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem;">
+            🚀 Submit Complaint & Run AI Analysis
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- AI Result & Duplicate/Hotspot Alert Section (Rendered upon submission) -->
+    <div id="result-section" style="display: none; animation: fadeIn 0.3s ease;">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <span class="badge badge-resolved" style="padding: 6px 16px; font-size: 0.9rem;">
+          ✓ Complaint Successfully Lodged & Analyzed
+        </span>
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-top: 0.5rem;" id="res-complaint-id-header">
+          Complaint #1000
+        </h2>
+      </div>
+
+      <!-- CIVIC HOTSPOT ALERT (If detected) -->
+      <div id="hotspot-banner-container"></div>
+
+      <!-- DUPLICATE COMPLAINTS ALERT (If detected) -->
+      <div id="duplicate-banner-container"></div>
+
+      <!-- AI ANALYSIS CARD -->
+      <div class="ai-analysis-card" style="margin-bottom: 1.75rem;">
+        <div class="ai-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.3rem;">🤖</span>
+            <span style="font-weight: 800; font-size: 1.15rem; letter-spacing: 0.5px;">AI ANALYSIS</span>
+          </div>
+          <div id="ai-engine-pill" class="ai-pill">
+            <span>⚡ Engine: Rule Engine Fallback</span>
+          </div>
+        </div>
+
+        <div class="ai-grid">
+          <div class="ai-metric">
+            <div class="ai-metric-label">Category</div>
+            <div class="ai-metric-val" id="ai-res-category">Streetlight</div>
+          </div>
+          <div class="ai-metric">
+            <div class="ai-metric-label">Severity</div>
+            <div class="ai-metric-val" id="ai-res-severity">HIGH</div>
+          </div>
+          <div class="ai-metric">
+            <div class="ai-metric-label">Recommended Dept</div>
+            <div class="ai-metric-val" id="ai-res-department" style="font-size: 0.95rem;">Electrical Department</div>
+          </div>
+          <div class="ai-metric">
+            <div class="ai-metric-label">Confidence</div>
+            <div class="ai-metric-val" id="ai-res-confidence">95%</div>
+            <div class="ai-bar">
+              <div class="ai-bar-fill" id="ai-res-bar" style="width: 95%;"></div>
+            </div>
+          </div>
+          <div class="ai-metric">
+            <div class="ai-metric-label">Priority Score</div>
+            <div class="ai-metric-val" id="ai-res-priority" style="color: #f87171;">HIGH</div>
+          </div>
+        </div>
+
+        <div class="ai-reasoning">
+          <strong>AI Reasoning: </strong>
+          <span id="ai-res-reasoning">Automated civic diagnosis based on visual tokens and issue text.</span>
+        </div>
+      </div>
+
+      <!-- Post-Submit Action Buttons -->
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+        <a id="btn-track-complaint" href="#" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
+          🔍 Track This Complaint Timeline
+        </a>
+        <a href="citizen-dashboard.html" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">
+          📊 Back to Citizen Dashboard
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Smart Municipality – AI-Powered Civic Issue Management and Prioritization System &copy; 2026</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/report.js"></script>
+</body>
+</html>

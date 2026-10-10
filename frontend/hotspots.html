@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Civic Hotspots Intelligence - Smart Municipality</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Strip -->
+  <div class="gov-strip">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span>🛡️ Municipal Officer Command Center</span>
+      <span class="badge-ai" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.4);">
+        GEOSPATIAL HOTSPOTS
+      </span>
+    </div>
+    <a href="officer-dashboard.html">← Back to Officer Dashboard</a>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="officer-dashboard.html" class="brand-wrapper">
+      <div class="brand-logo" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">🏛️</div>
+      <div class="brand-text">
+        <h1>SMART MUNICIPALITY</h1>
+        <p>Civic Hotspot Intelligence & Clustering</p>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="officer-dashboard.html">📊 Dashboard</a></li>
+      <li><a href="hotspots.html" class="active">🔥 Civic Hotspots</a></li>
+      <li><a href="javascript:void(0)" onclick="auth.logout()">🚪 Logout</a></li>
+    </ul>
+    <div class="nav-user">
+      <div class="user-badge" id="nav-user-badge">
+        <div class="user-avatar" id="nav-user-avatar" style="background:#0f172a;">O</div>
+        <span id="nav-user-name">Officer</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    
+    <!-- Header Banner -->
+    <div style="background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%); color: white; border-radius: var(--radius-lg); padding: 2rem 2.25rem; margin-bottom: 2rem; box-shadow: var(--shadow-md);">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <span class="badge" style="background: rgba(255, 255, 255, 0.2); color: white; margin-bottom: 0.5rem;">
+            ALGORITHMIC CLUSTER DETECTION
+          </span>
+          <h2 style="font-size: 1.65rem; font-weight: 800;">
+            Civic Infrastructure Hotspots
+          </h2>
+          <p style="font-size: 0.95rem; opacity: 0.9; margin-top: 0.35rem; max-width: 700px;">
+            Identifies repetitive civic failures concentrated at specific roadways and intersections. Automatically escalates priority to prevent major hazards.
+          </p>
+        </div>
+        <div>
+          <span style="font-size: 2.5rem;">🚨</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISUAL HOTSPOT RADAR / LOCATION PANEL (Requirement 7) -->
+    <div style="margin-bottom: 2rem;">
+      <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>📍 Visual Location Hotspot Radar Panel</span>
+      </h3>
+      <div id="hotspot-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+
+    <!-- HOTSPOTS DETAILED TABLE -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span>📋 All Monitored Civic Hotspots</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="loadHotspotsData()">🔄 Refresh</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Hotspot ID</th>
+              <th>Location</th>
+              <th>Civic Issue Category</th>
+              <th>Report Volume</th>
+              <th>Severity</th>
+              <th>Escalated Priority</th>
+              <th>Responsible Department</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="hotspots-tbody">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Smart Municipality – AI-Powered Civic Issue Management and Prioritization System &copy; 2026</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = auth.requireRole('MUNICIPAL_OFFICER');
+      if (!user) return;
+      await loadHotspotsData();
+    });
+
+    async function loadHotspotsData() {
+      try {
+        const hotspots = await api.getHotspots();
+        renderHotspots(hotspots);
+      } catch (e) {
+        showToast('Failed to load hotspots: ' + e.message, 'error');
+      }
+    }
+
+    function renderHotspots(hotspots) {
+      const grid = document.getElementById('hotspot-cards-grid');
+      const tbody = document.getElementById('hotspots-tbody');
+
+      grid.innerHTML = '';
+      tbody.innerHTML = '';
+
+      if (!hotspots || hotspots.length === 0) {
+        grid.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align:center; padding:2.5rem; color:#64748b;">No active civic hotspots currently detected. Minimum cluster threshold is 3 complaints.</div>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:#64748b;">No hotspots registered.</td></tr>`;
+        return;
+      }
+
+      hotspots.forEach(h => {
+        // 1. Radar Card
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.borderLeft = '5px solid #ef4444';
+        card.style.position = 'relative';
+
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <div>
+              <span class="badge badge-hotspot" style="font-size: 0.72rem; margin-bottom: 0.4rem;">
+                🔥 ACTIVE HOTSPOT
+              </span>
+              <h4 style="font-size: 1.25rem; font-weight: 800; color: var(--primary);">${h.location}</h4>
+            </div>
+            <div style="background: #fee2e2; color: #991b1b; font-weight: 800; border-radius: 8px; padding: 6px 12px; font-size: 1.1rem; text-align: center;">
+              ${h.reportCount}
+              <div style="font-size: 0.65rem; text-transform: uppercase;">Reports</div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Issue: <strong style="color: var(--primary);">${h.category}</strong>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; background: #f8fafc; padding: 0.75rem; border-radius: 6px; font-size: 0.82rem; margin-bottom: 1rem;">
+            <div>
+              <div style="color: #64748b; font-size: 0.7rem; text-transform: uppercase;">Severity</div>
+              <strong style="color: #dc2626;">${h.severity}</strong>
+            </div>
+            <div>
+              <div style="color: #64748b; font-size: 0.7rem; text-transform: uppercase;">Priority</div>
+              <strong style="color: #b91c1c;">${h.priority}</strong>
+            </div>
+            <div style="grid-column: 1/-1;">
+              <div style="color: #64748b; font-size: 0.7rem; text-transform: uppercase;">Responsible Department</div>
+              <strong style="color: #0369a1;">${h.responsibleDepartment || 'Electrical Department'}</strong>
+            </div>
+          </div>
+
+          <a href="officer-dashboard.html?location=${encodeURIComponent(h.location)}" class="btn btn-secondary btn-sm" style="width: 100%;">
+            🔍 Filter Complaints on ${h.location} →
+          </a>
+        `;
+        grid.appendChild(card);
+
+        // 2. Table Row
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>#H-${h.id}</strong></td>
+          <td><strong>${h.location}</strong></td>
+          <td>${h.category}</td>
+          <td><span class="badge" style="background:#fee2e2; color:#991b1b; font-weight:800;">${h.reportCount} Reports</span></td>
+          <td><span class="badge badge-high">${h.severity}</span></td>
+          <td><span class="badge" style="background:#fee2e2; color:#991b1b; font-weight:800; border:1px solid #f87171;">${h.priority}</span></td>
+          <td><strong>${h.responsibleDepartment || 'Electrical'}</strong></td>
+          <td><span class="badge badge-resolved">${h.status}</span></td>
+          <td>
+            <a href="officer-dashboard.html" class="btn btn-primary btn-sm">
+              Review in Triage
+            </a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
+</body>
+</html>

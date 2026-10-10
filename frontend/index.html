@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Municipality - AI Civic Issue Management</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Strip -->
+  <div class="gov-strip">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <span>🏛️ Municipal Corporation Civic Intelligence Portal</span>
+      <span class="badge-ai">AI-POWERED</span>
+    </div>
+    <div>
+      <span>College Round 2 Software Project</span>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="index.html" class="brand-wrapper">
+      <div class="brand-logo">🏙️</div>
+      <div class="brand-text">
+        <h1>SMART MUNICIPALITY</h1>
+        <p>AI-Powered Civic Issue Management & Prioritization</p>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="login.html">Citizen Portal</a></li>
+      <li><a href="login.html?role=officer">Officer Portal</a></li>
+      <li><a href="login.html" class="btn btn-primary btn-sm" style="color:white;">Login</a></li>
+    </ul>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="container">
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; border-radius: var(--radius-lg); padding: 3.5rem 2.5rem; margin-bottom: 2.5rem; position: relative; overflow: hidden; border: 1px solid #334155; box-shadow: var(--shadow-lg);">
+      <div style="max-width: 760px; position: relative; z-index: 2;">
+        <span class="badge" style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.4); margin-bottom: 1rem;">
+          NEXT-GEN CIVIC INFRASTRUCTURE
+        </span>
+        <h1 style="font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem;">
+          AI-Powered Civic Issue Management & Prioritization System
+        </h1>
+        <p style="font-size: 1.05rem; color: #94a3b8; margin-bottom: 2rem; line-height: 1.6;">
+          Report broken streetlights, potholes, overflowing garbage, and water leaks. Our intelligent platform leverages AI for automated category classification, duplicate detection, civic hotspot recognition, and end-to-end resolution tracking.
+        </p>
+
+        <!-- One-Click Demo Action Bar -->
+        <div style="background: rgba(255,255,255,0.06); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.12); margin-bottom: 1.5rem;">
+          <div style="font-size: 0.82rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem;">
+            ⚡ Quick Demo Evaluation Access (One-Click Login)
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+            <button class="btn btn-primary" onclick="demoLogin('citizen@municipality.gov', 'citizen123', 'citizen-dashboard.html')">
+              👤 Launch Citizen Demo (Rajesh Kumar)
+            </button>
+            <button class="btn btn-secondary" style="background: #334155; color: white; border-color: #475569;" onclick="demoLogin('officer@municipality.gov', 'officer123', 'officer-dashboard.html')">
+              🛡️ Launch Officer Demo (Inspector Priya)
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="login.html" class="btn btn-primary">Citizen Login & Report</a>
+          <a href="register.html" class="btn btn-secondary" style="color:white; background:transparent; border-color: #475569;">Register New Citizen</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core Pillars Grid -->
+    <div style="margin-bottom: 2rem;">
+      <h2 style="font-size: 1.35rem; font-weight: 800; color: var(--primary); margin-bottom: 1.25rem;">
+        Key Architectural Capabilities
+      </h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">🤖</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">AI Multimodal Triage</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Analyzes uploaded complaint image and text description to infer category, severity, confidence level, and responsible department.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">🔍</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">Duplicate Detection</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Automatically compares new complaints against historical records using semantic text similarity, category, and spatial location metrics.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">📍</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">Civic Hotspot Detection</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Aggregates cluster complaints at the same road or vicinity to detect infrastructure hotspots and escalate priority to URGENT.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">⚖️</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">Algorithmic Priority Score</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Calculates an automated urgency score factoring in AI severity, cluster volume, hazard category, and active hotspot states.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">🏢</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">Municipal Department Dispatch</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Routes issues directly to Electrical, Roads, Sanitation, Water Supply, Drainage, Traffic, and Public Works teams.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 2rem; margin-bottom: 0.75rem;">⏱️</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--primary);">Live Status Tracking</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted);">
+            Complete citizen timeline tracking from SUBMITTED → ASSIGNED → IN_PROGRESS → RESOLVED with official notes and timestamps.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Smart Municipality – AI-Powered Civic Issue Management and Prioritization System &copy; 2026. Built with Spring Boot, MySQL, and Modern Web Standards.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    async function demoLogin(email, password, redirectUrl) {
+      try {
+        const res = await api.login(email, password);
+        auth.setUser(res);
+        showToast(`Logged in as ${res.name}`, 'success');
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 500);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>
